@@ -1,5 +1,6 @@
 package com.example.calculator
 
+import android.icu.text.DecimalFormat
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -18,6 +19,8 @@ class MainActivity : AppCompatActivity() {
 
     var status: String? = null
     var operator: Boolean = false
+
+    var myFormatter = DecimalFormat("######.######")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,8 +69,15 @@ class MainActivity : AppCompatActivity() {
 
         mainBinding.btnAC.setOnClickListener{
 
+            onButtonACClicked()
+
         }
         mainBinding.btnDel.setOnClickListener{
+
+            number?.let{
+                number = it.substring(0,it.length-1)
+                mainBinding.textViewResult.text = number
+            }
 
         }
         mainBinding.btnDivide.setOnClickListener{
@@ -139,11 +149,32 @@ class MainActivity : AppCompatActivity() {
         }
         mainBinding.btnEquals.setOnClickListener{
 
+            if (operator){
+                when(status){
+                    "multiplication" -> multiply()
+                    "division" -> divide()
+                    "subtraction" -> minus()
+                    "addition" -> plus()
+
+                    else -> firstNumber = mainBinding.textViewResult.text.toString().toDouble()
+                }
+            }
+            operator = false
+
         }
         mainBinding.btnDot.setOnClickListener{
 
         }
 
+    }
+
+    private fun onButtonACClicked() {
+        number = null
+        status = null
+        mainBinding.textViewResult.text = "0"
+        mainBinding.textViewHistory.text = ""
+        firstNumber = 0.0
+        lastNumber = 0.0
     }
 
     fun onNumberClicked(clickedNumber: String){
@@ -161,17 +192,17 @@ class MainActivity : AppCompatActivity() {
     fun plus(){
         lastNumber = mainBinding.textViewResult.text.toString().toDouble()
         firstNumber += lastNumber
-        mainBinding.textViewResult.text = firstNumber.toString()
+        mainBinding.textViewResult.text = myFormatter.format(firstNumber)
     }
     fun minus(){
         lastNumber = mainBinding.textViewResult.text.toString().toDouble()
         firstNumber -= lastNumber
-        mainBinding.textViewResult.text = firstNumber.toString()
+        mainBinding.textViewResult.text = myFormatter.format(firstNumber)
     }
     fun multiply(){
         lastNumber = mainBinding.textViewResult.text.toString().toDouble()
         firstNumber *= lastNumber
-        mainBinding.textViewResult.text = firstNumber.toString()
+        mainBinding.textViewResult.text = myFormatter.format(firstNumber)
     }
    fun divide(){
         lastNumber = mainBinding.textViewResult.text.toString().toDouble()
@@ -181,7 +212,7 @@ class MainActivity : AppCompatActivity() {
 
        }else{
            firstNumber /= lastNumber
-           mainBinding.textViewResult.text = firstNumber.toString()
+           mainBinding.textViewResult.text = myFormatter.format(firstNumber)
        }
     }
 
